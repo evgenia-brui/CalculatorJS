@@ -116,6 +116,11 @@ function handlerCallBackForm(event) {
         } else {
             optionMobileTemplates.disabled = true;
             optionMobileTemplates.checked = false;
+            document.querySelector('.mobileTemplates_value').textContent = 'Нет';
+        }
+
+        if (target.name === 'option') {
+            document.querySelector('.' + target.id + '_value').textContent = target.checked ? 'Да' : 'Нет';
         }
 
         priceCalculation(target);
