@@ -22,6 +22,7 @@ const endButton = document.querySelector('.end-button');
 const total = document.querySelector('.total');
 const fastRange = document.querySelector('.fast-range');
 const totalPriceSum = document.querySelector('.total_price__sum');
+const optionAdapt = document.getElementById('adapt');
 
 function showElem(elem) {
     elem.style.display = 'block';
@@ -36,7 +37,7 @@ function priceCalculation(elem) {
     let index = 0;
     let options = [];
 
-    if (elem.name == 'whichSite') {
+    if (elem.name === 'whichSite') {
         for (const item of formCalculate.elements) {
             if (item.type === 'checkbox') {
                 item.checked = false;
@@ -83,6 +84,11 @@ function handlerCallBackForm(event) {
     }
 
     if (target.classList.contains('calc-handler')) {
+        if (target.value === 'mobileTemplates' && !optionAdapt.checked) {
+            target.checked = false;
+            return;
+        }
+
         priceCalculation(target);
     }
 }
