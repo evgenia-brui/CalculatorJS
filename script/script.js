@@ -1,5 +1,7 @@
 'use strict';
 
+const DAY_STRING = ['день', 'дня', 'дней'];
+
 const DATA = {
     whichSite: ['landing', 'multiPage', 'onlineStore'],
     price: [4000, 8000, 26000],
@@ -14,15 +16,25 @@ const DATA = {
     deadlinePercent: [20, 17, 15]
 }
 
-const startButton = document.querySelector('.start-button');
-const firstScreen = document.querySelector('.first-screen');
-const mainForm = document.querySelector('.main-form');
-const formCalculate = document.querySelector('.form-calculate');
-const endButton = document.querySelector('.end-button');
-const total = document.querySelector('.total');
-const fastRange = document.querySelector('.fast-range');
-const totalPriceSum = document.querySelector('.total_price__sum');
-const optionAdapt = document.getElementById('adapt');
+const   startButton = document.querySelector('.start-button'),
+        firstScreen = document.querySelector('.first-screen'),
+        mainForm = document.querySelector('.main-form'),
+        formCalculate = document.querySelector('.form-calculate'),
+        endButton = document.querySelector('.end-button'),
+        total = document.querySelector('.total'),
+        fastRange = document.querySelector('.fast-range'),
+        totalPriceSum = document.querySelector('.total_price__sum'),
+        optionAdapt = document.getElementById('adapt'),
+        optionMobileTemplates = document.getElementById('mobileTemplates'),
+        typeSite = document.querySelector('.type-site'),
+        maxDeadline = document.querySelector('.max-deadline'),
+        rangeDeadline = document.querySelector('.range-deadline'),
+        deadlineValue = document.querySelector('.deadline-value');
+
+function declOfNum(n, titles) {
+    return n + ' ' + titles[n % 10 === 1 && n % 100 !== 11 ?
+        0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2];
+}
 
 function showElem(elem) {
     elem.style.display = 'block';
@@ -32,10 +44,22 @@ function hideElem(elem) {
     elem.style.display = 'none';
 }
 
+function renderTextContent(total, site, maxDay, minDay) {
+    typeSite.textContent = site;
+    totalPriceSum.textContent = total;
+    maxDeadline.textContent = declOfNum(maxDay, DAY_STRING);
+    rangeDeadline.min = minDay;
+    rangeDeadline.max = maxDay;
+    deadlineValue.textContent = declOfNum(rangeDeadline.value, DAY_STRING)
+}
+
 function priceCalculation(elem) {
-    let result = 0;
-    let index = 0;
-    let options = [];
+    let result = 0,
+        index = 0,
+        options = [],
+        site = '',
+        maxDeadlineDay = DATA.deadlineDay[index][1],
+        minDeadlineDay = DATA.deadlineDay[index][0];
 
     if (elem.name === 'whichSite') {
         for (const item of formCalculate.elements) {
@@ -50,6 +74,9 @@ function priceCalculation(elem) {
     for (const item of formCalculate.elements) {
         if (item.name === 'whichSite' && item.checked) {
             index = DATA.whichSite.indexOf(item.value);
+            site = item.dataset.site;
+            maxDeadlineDay = DATA.deadlineDay[index][1];
+            minDeadlineDay = DATA.deadlineDay[index][0];
         } else if (item.classList.contains('calc-handler') && item.checked) {
             options.push(item.value);
         }
@@ -73,7 +100,7 @@ function priceCalculation(elem) {
 
     result += DATA.price[index];
 
-    totalPriceSum.textContent = result;
+    renderTextContent(result, site, maxDeadlineDay, minDeadlineDay);
 }
 
 function handlerCallBackForm(event) {
@@ -84,9 +111,11 @@ function handlerCallBackForm(event) {
     }
 
     if (target.classList.contains('calc-handler')) {
-        if (target.value === 'mobileTemplates' && !optionAdapt.checked) {
-            target.checked = false;
-            return;
+        if (optionAdapt.checked) {
+            optionMobileTemplates.disabled = false;
+        } else {
+            optionMobileTemplates.disabled = true;
+            optionMobileTemplates.checked = false;
         }
 
         priceCalculation(target);
